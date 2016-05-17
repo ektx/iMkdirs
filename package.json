@@ -1,0 +1,17 @@
+{
+	"name": "imkdirs",
+	"version": "0.0.2",
+	"description": "多层级文件夹生成",
+	"main": "mkdirs.js",
+	"bin": {
+		"mks": "mks.js"
+	},
+	"keywords": [
+		"nodejs", "mkdir"
+	],
+	"author": {
+		"name": "ektx",
+		"email": "530675800@qq.com"
+	},
+	"license": "MIT"
+}
