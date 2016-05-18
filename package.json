@@ -1,6 +1,6 @@
 {
 	"name": "imkdirs",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "多层级文件夹生成",
 	"main": "mkdirs.js",
 	"bin": {
