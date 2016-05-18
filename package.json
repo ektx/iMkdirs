@@ -1,10 +1,14 @@
 {
 	"name": "imkdirs",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"description": "多层级文件夹生成",
 	"main": "mkdirs.js",
 	"bin": {
 		"mks": "mks.js"
+	},
+	"repository": {
+		"type": "git",
+		"url" : "https://github.com/ektx/iMkdirs.git"
 	},
 	"keywords": [
 		"nodejs", "mkdir"
