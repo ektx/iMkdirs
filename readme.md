@@ -2,14 +2,18 @@
 
 多层级文件夹生成
 
-### 安装
+## 安装
 #### 全局使用
-`npm install -g imkdrs`
+```shell
+npm install -g imkdrs
+```
 
 #### 文件引用 
-`npm install imkdrs`
+```shell
+npm install imkdrs
+```
 
-### 示例
+## 示例
 #### 全局使用
 ```shell
 # 生成 abc def 123 三个文件夹
