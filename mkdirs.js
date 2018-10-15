@@ -1,42 +1,120 @@
-/*!
- * iMkdirs
- * Copyright(c) 2016 ektx
+/*
+	iMkdirs 4
+	-----------------------------
+	Copyright(c) 2017 ektx
+	增加对地址数组功能的支持
+
  */
 
-var fs = require('fs');
-var path = require('path');
+const fs = require('fs')
+const path = require('path')
 
-var delayPath = [];
+/*
+	@pathArr [array] 地址目录，例如：['a/b/c', 'a/d']
+	@parentPath [string] 父级目录，例如： '/' 根目录 
+	@doneCallback 【function】完成后回调方法
+	@mkCallback [function] 每生成文件目录时回调方法
+*/
+async function mkdirs(pathArr, parentPath, doneCallback, mkCallback) {
 
-function mkdirs(toURL) {
+	let mkPathObj = array2tree(pathArr)
 
-	try {
-		var isMS = fs.mkdirSync(toURL)
+	let needMKDirArr = tree2array(mkPathObj)
 
-		if (!isMS) {
-			
-			if(delayPath.length == 0) {
-				console.log(toURL+' 文件夹生成完成!')
-				return;
-			}
+	await loopEvt(needMKDirArr, parentPath, mkCallback)
 
-			// 反向调用地址列表
-			// 然后删除最初的那个
-			var _toPath = (delayPath.reverse())[0]
-			delayPath.shift()
-			mkdirs(_toPath)
-		}
-	} catch(err) {
-
-		// 返回错误为无法生成时
-		if (err.code === 'ENOENT') {
-
-			delayPath.push(toURL);
-			var _path = path.dirname(toURL)
-			mkdirs(_path)
-		}
-	}
+	if (doneCallback) doneCallback()
 
 }
 
 module.exports = mkdirs;
+
+/*
+	将数组转换成对象
+	['a/b/c', 'a/d']
+	=>
+	{
+		a: {
+			b: {
+				c: {}
+			},
+			d: {}
+		}
+	}
+*/
+function array2tree (arr) {
+	let obj = {}
+
+	arr.forEach( (val,i) => {
+
+		let innerArr = val.split('/')
+		let checkObj = obj
+
+		innerArr.forEach((iVal, x, iarr) => {
+			if (iVal !== '') {
+				if (!(iVal in checkObj)) {
+					checkObj[iVal] = {}
+					checkObj[iVal].path = iarr.slice(0, x+1).join('/')
+				}
+				checkObj = checkObj[iVal]
+			} 
+		})
+	})
+
+	return obj
+}
+
+/*
+	对象转数组
+*/
+function tree2array (obj) {
+	let arr = []
+	let loopObj = function(_o) {
+		for (let [key, val] of Object.entries(_o)) {
+
+			if (val.path)
+				arr.push(val.path)
+
+			if (typeof val === 'object') {
+				loopObj(val)
+			}
+		}
+	}
+	
+	loopObj(obj)
+
+	return arr
+}
+
+/*
+	循环事件
+*/
+async function loopEvt (arr, parent, mkCallback) {
+	for (let val of arr) {
+		await mkdirEvt(val, parent)
+		if (mkCallback) mkCallback(val)
+	}
+}
+
+/*
+	@to 生成的目录
+	@parent 父级目录
+*/
+function mkdirEvt (to, parent = process.cwd()) {
+	return new Promise( (resolve, reject) => {
+		// console.log('进程当前工作的目录:',process.cwd())
+		let mkPath = path.join(parent, to)
+		
+		fs.mkdir(mkPath, err => {
+			if (err) {
+				reject(err)
+				return
+			}
+
+			resolve()
+		})
+		
+	}).catch(err => {
+		return err
+	})
+}
